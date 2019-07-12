@@ -1,37 +1,42 @@
 pipeline {
     agent any
-    stages{
+    
+    parameters { 
+         string(name: 'tomcat_dev', defaultValue: '50.112.220.103', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '50.112.220.103', description: 'Production Server')
+    } 
+ 
+    triggers {
+         pollSCM('* * * * *') // Polling Source Control
+     }
+ 
+stages{
         stage('Build'){
             steps {
-                sh 'mvn clean package'
+                bat 'mvn clean package'
             }
             post {
-            	success {
-            		echo 'Now Archiving...'
-            		archiveArtifacts artifacts: '**/target/*.war'
-            	}
+                success {
+                    echo 'Now Archiving...'
+                    archiveArtifacts artifacts: '**/target/*.war'
+                }
             }
         }
-        stage('Deploy to Staging'){
-        	steps{
-        		build job: 'Deploy'
-        	}
-        }
-        stage('Deploy to Production'){
-        	steps{
-        		timeout(time:5, unit:'DAYS'){
-        			input message:'Aprove PRODUCTION Deployment?'
-        		}
-        		build job:'deploy-to-prod'
-        	}
-        	post{
-        		success{
-        			echo 'Code Deployment to production.'
-        		}
-        		failure{
-        			echo 'Deployment failed.'
-        		}
-        	}
+ 
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        bat "winscp -i  **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat8/webapps"
+                    }
+                }
+ 
+                stage ("Deploy to Production"){
+                    steps {
+                        bat "winscp -i **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat8/webapps"
+                    }
+                }
+            }
         }
     }
 }
