@@ -4,15 +4,14 @@ pipeline {
         stage ('Initialize') {
             steps {
                 sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
+                    mvn clean package
                 ''' 
             }
         }
 
         stage ('Build') {
             steps {
-               sh 'mvn clean package'
+               sh 'mvn clean -f Tomcat-Web-App'
             }
         }
     }
