@@ -1,9 +1,9 @@
-pipeline {
-    agent any
-    stages {
-        stage ('Initialize') {
-            steps {
-                sh 'Hola'
+pipeline { 
+    agent any  
+    stages { 
+        stage('Build') { 
+            steps { 
+               echo 'This is a minimal pipeline.' 
             }
         }
     }
