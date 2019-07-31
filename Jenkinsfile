@@ -1,10 +1,7 @@
-pipeline { 
-    agent any  
-    stages { 
-        stage('Build') { 
-            steps { 
-               mvn clean Tomcat Web App 
-            }
-        }
-    }
+#!groovy
+
+node {
+   echo 'Compilando aplicación'
+   sh 'mvn clean Tomcat Web App'
+
 }
