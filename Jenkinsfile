@@ -3,7 +3,7 @@ pipeline {
     stages { 
         stage('Build') { 
             steps { 
-               sh mvn clean 'Tomcat-Web-App' 
+               sh 'clean Tomcat-Web-App' 
             }
         }
     }
